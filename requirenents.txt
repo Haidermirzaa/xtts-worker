@@ -1,0 +1,23 @@
+# Exact versions tested to work together with XTTS v2 on Python 3.10.
+# Do NOT upgrade TTS past 0.22.0 — later versions break XTTS voice cloning.
+# Do NOT upgrade transformers past 4.40.2 — config parsing changed.
+
+# Core voice cloning
+TTS==0.22.0
+
+# Coqui TTS's dependencies — pin them so pip doesn't pick broken versions
+transformers==4.40.2
+tokenizers==0.19.1
+numpy==1.24.4
+scipy==1.11.4
+soundfile==0.12.1
+librosa==0.10.2.post1
+encodec==0.1.1
+
+# PyTorch — RunPod's base image usually has this, but pin to be safe.
+# If the RunPod base image already includes torch, comment these out.
+torch==2.1.2
+torchaudio==2.1.2
+
+# RunPod serverless SDK
+runpod==1.6.2
