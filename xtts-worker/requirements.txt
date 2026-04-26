@@ -1,0 +1,11 @@
+TTS==0.22.0
+transformers==4.40.2
+tokenizers==0.19.1
+numpy==1.24.4
+scipy==1.11.4
+soundfile==0.12.1
+librosa==0.10.2.post1
+encodec==0.1.1
+torch==2.1.2
+torchaudio==2.1.2
+runpod==1.6.2
