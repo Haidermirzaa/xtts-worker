@@ -4,8 +4,6 @@ name: Build and push XTTS worker to Docker Hub
 on:
   push:
     branches: [main]
-    paths:
-      - 'xtts-worker/**'   # Only rebuild if files in xtts-worker/ change
   workflow_dispatch:        # Allows manual trigger from GitHub UI
 
 jobs:
@@ -38,14 +36,15 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # 5. Build the image and push directly to Docker Hub
+      #    Building from repo root (.) so Dockerfile + handler.py + requirements.txt
+      #    must be at the top level of the repo.
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./xtts-worker
+          context: .
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/xtts-worker:latest
-          # Cache layers between builds — second build is way faster
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
