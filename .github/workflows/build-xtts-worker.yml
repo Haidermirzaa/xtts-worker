@@ -14,21 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # ⚙️ DIAGNOSTIC: list every file in the repo so we can SEE what's there
-      - name: Show repo contents
-        run: |
-          echo "=== Files at repo root ==="
-          ls -la
-          echo ""
-          echo "=== Full recursive tree (first 100 lines) ==="
-          find . -type f -not -path './.git/*' | head -100
-          echo ""
-          echo "=== Looking specifically for Dockerfile ==="
-          find . -iname "dockerfile*" -not -path './.git/*'
-          echo ""
-          echo "=== Current working directory ==="
-          pwd
-
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -45,10 +30,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Files are in xtts-worker/ subfolder, so context points there
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./xtts-worker
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/xtts-worker:latest
