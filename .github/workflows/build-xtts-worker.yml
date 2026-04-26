@@ -1,22 +1,34 @@
 name: Build and push XTTS worker to Docker Hub
 
-# Triggers: builds on every push to main, or manually from the Actions tab
 on:
   push:
     branches: [main]
-  workflow_dispatch:        # Allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60     # Should finish in ~25 min, but allow buffer
+    timeout-minutes: 60
 
     steps:
-      # 1. Get your code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Free up disk space on the runner — XTTS image needs ~12 GB
+      # ⚙️ DIAGNOSTIC: list every file in the repo so we can SEE what's there
+      - name: Show repo contents
+        run: |
+          echo "=== Files at repo root ==="
+          ls -la
+          echo ""
+          echo "=== Full recursive tree (first 100 lines) ==="
+          find . -type f -not -path './.git/*' | head -100
+          echo ""
+          echo "=== Looking specifically for Dockerfile ==="
+          find . -iname "dockerfile*" -not -path './.git/*'
+          echo ""
+          echo "=== Current working directory ==="
+          pwd
+
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -24,20 +36,15 @@ jobs:
           sudo rm -rf /opt/ghc
           df -h
 
-      # 3. Set up Docker Buildx (better build engine than default)
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 4. Login to Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 5. Build the image and push directly to Docker Hub
-      #    Building from repo root (.) so Dockerfile + handler.py + requirements.txt
-      #    must be at the top level of the repo.
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -48,7 +55,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 6. Show the final image size in the log
       - name: Image info
         run: |
           echo "✅ Image pushed successfully!"
